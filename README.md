@@ -150,3 +150,57 @@ result :
 
 
 ```
+
+<br><br><br><br><br>
+
+- **Smart Contract**
+    - 디지털 형식으로 명시된 서약들의 집합
+    - 서면으로 이루어지던 **계약**을 **코드**로 구현하고
+    
+          특정 조건이 충족되었을 때 해당 계약을 이행하도록 하는 script
+    
+    프로그램을 돌리면, 전세계 컴퓨터에서 동시에 이를 처리하기 때문에,
+    
+    특정 언어를 사용해야 한다.
+    
+    <br>
+    
+    - Solidity  (이더리움 기준)
+    
+    ![image](https://user-images.githubusercontent.com/53833541/155158497-756a1135-8dde-4a54-abb1-0ddc0ebc7cf4.png)
+    
+    + 스마트 컨트랙트 코드 작성
+    + 해당 코드 내용을 EVM 바이트 코드와, ABI - JSON 형태의 interface를 뽑아낸다
+    + 스마트 컨트랙트 내용의 바이트 코드가 담긴 트랜잭션 생성
+    + 서명 후 전세계 이더리움 네트워크로 전송
+    + 전세계 이더리움 네트워크에 참여한 모든 컴퓨터들이 해당 내용을 받는다
+    + 해당 내용들은 Block 안에 담긴다
+    + Block은 불변의 데이터이기 때문에, 스마트 컨트랜트 코드는 불변의 코드가 된다
+    + 컨트랙트 배포시 CA(컨트랙트 주소) 사용
+    + 배포된 스마트 컨트랙트는 CA와 ABI(인터페이스)를 통해 해당 프로그램 로직을 실행
+    
+    <br>
+
+- **Remix**
+    - 별도의 개발 환경 설정 없이  스마트 컨트랙트를 작성, 배포, 호출 가능한 IDE
+    
+    ![image](https://user-images.githubusercontent.com/53833541/155158597-6c779180-c8ba-4950-93f5-8c26d717ba51.png)
+    
+    <br>
+
+- **Remix IDE를 이용하여 스마트 컨트랙트 배포**
+    + 배포할 컨트랙트 준비
+        - File explorers - contracts - Storage.sol 선택
+        - Compile
+            - Compiler 버전 맞추기
+            - 사용한 언어 선택
+            - EVM 버전 맞추기
+            - auto compile - 변경시 자동으로 컴파일 <br>
+    + 컴파일
+        - contracts 폴더 내부에 artifacts 폴더
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155158683-54e05963-8619-4ffc-9f2e-edae3fb2b26a.png)
+            
+        - 바이트 코드와 ABI 뽑아낸걸 확인 <br>
+    + 배포
+        - Deploy & Run Transactions
