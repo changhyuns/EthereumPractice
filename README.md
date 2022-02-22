@@ -204,3 +204,24 @@ result :
         - 바이트 코드와 ABI 뽑아낸걸 확인 <br>
     + 배포
         - Deploy & Run Transactions
+        - Environment
+            - JavaScript VM 선택 - 브라우저에서 제공하는 VM에서 테스트할 수 있는 환경
+        - Account
+            - 100 ETH 충전되어 있는 (gas 소비) 계정 10개 제공
+        - Deploy
+            - VM 로그 확인 (콘솔창)
+		
+	        ![image](https://user-images.githubusercontent.com/53833541/155167335-4afb32d5-6626-41da-bf6f-316c0ebdd78e.png)
+	
+	    - 컨트랙트 주소 확인 (Deployed Contracts)
+	    
+	        ![image](https://user-images.githubusercontent.com/53833541/155167452-a762e45c-905d-4ae0-a835-0d3699daa14d.png)
+	
+	
+	<br>
+
+- **Smart Contract 호출**
+    - 호출
+    - Deployed Contract 삭제
+    - CA로 컨트랙트 접근
+    - 호출
