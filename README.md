@@ -332,7 +332,7 @@ result :
         ![image](https://user-images.githubusercontent.com/53833541/155468067-b1d479d7-90fb-48eb-a2d3-5002380ab206.png)
         
     
-    **과제2  :  상태 변수의 의미 알기**
+    **상태 변수의 의미 알아보기**
     
     - chairperson 변수 호출
         - 컨트랙트 배포를 수행한 주소가 할당되어 있는지 확인
@@ -355,7 +355,7 @@ result :
             ![image](https://user-images.githubusercontent.com/53833541/155468618-3cadce5d-915f-4073-b17d-789bdace2d60.png)
             
     
-    **과제3  :  함수 및 변수 호출하기**
+    **함수 및 변수 호출해보기**
     
     - 아직 선택하지 않은 계정을 이용하여 delegate() 호출
         - delegate()   →  유권자에게 투표 위임
@@ -388,7 +388,7 @@ result :
         ![image](https://user-images.githubusercontent.com/53833541/155468802-3eadef99-3626-4e11-bf7a-936c9480d47c.png)
         
     
-    **과제4  :  3_Ballot을 Ropsten 테스트넷에 배포하기**
+    **3_Ballot을 Ropsten 테스트넷에 배포해보기**
     
     - 사전 확인  :  MetaMask 지갑이 Ropsten Test Network에 연결되어 있는지 확인
         
