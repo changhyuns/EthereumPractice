@@ -220,8 +220,199 @@ result :
 	
 	<br>
 
+
 - **Smart Contract 호출**
     - 호출
+        - Deployed Contracts 열기
+        - store & retrieve
+            - **store** ( SETTER 느낌 )
+                
+                ![image](https://user-images.githubusercontent.com/53833541/155366767-ae477756-b5bc-45cf-bd72-bff638402e52.png)
+                
+                - uint256 number 멤버변수 (전 세계 컴퓨터에 저장되는 값)
+                    
+                    store할 때에는, 전 세계 컴퓨터에 값을 저장해야 하므로 gas비 소모
+                    
+                - number값은 전 세계 이더리움 네트워크에 올라가면,
+                    
+                    불변의 값이 되면서 (블록체인 특성) 
+                    
+                    store 함수를 또 한 번 호출하면서 값을 변경해주지 않는 이상
+                    
+                    (해당 컨트랙트를 호출하지 않는 이상) 누구도 값을 변경할 수 없음
+                    
+                    **신뢰할 수 있다 !**
+                    
+            - **retrieve** ( GETTER 느낌 )
+                
+                ![image](https://user-images.githubusercontent.com/53833541/155366805-62865381-0ab5-43c4-9219-700813f5d0dd.png)
+                
+                - 값을 설정한 적이 없는데 uint256 : 0 으로 설정된 것을 볼 수 있음
+                - 단순히 저장된 값을 불러오는 것이기 때문에, gas비 소모하지 않는다.
     - Deployed Contract 삭제
     - CA로 컨트랙트 접근
+        - Contract 주소 복사
+        - At address에 컨트랙트 주소 입력 (붙여넣기)
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155366859-c3c486bf-e625-408a-bc51-7af98fb512dd.png)
+            
     - 호출
+        - 누구나 접근 가능 (컨트랙트 주소만 알면) - retrieve 가능
+        - ABI만 있으면, 값을 변경(store)할 수 있음
+
+
+<br><br>
+
+- **Practice**
+    
+    **Remix에서 3_Ballot.sol 배포해보기**
+    
+    - Constructor 개념 이해
+    - Parameter 확인
+        
+        <aside>
+        💡 proposalNames  →  투표 항목 !   ex) 기호1, 기호2, 기호3
+        bytes32[] memory proposalNames = [
+        "0xeab8b0ed98b83100000000000000000000000000000000000000000000000000", "0xeab8b0ed98b83200000000000000000000000000000000000000000000000000", "0xeab8b0ed98b83300000000000000000000000000000000000000000000000000"
+        ]
+        
+        </aside>
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155467950-f7296e4f-c93a-412a-87da-f99b38cd41fd.png)
+        
+    - Deploy & Run Transactions
+        - Ballot Contract 확인 및 Deploy시 parameter 타입 확인
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155467970-67b217fd-9be6-4570-83bd-667b93c87296.png)
+            
+        - 음... 검색해보니까  이런 형태로 넘겨줘야 한다고 한다....
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468461-81a9778f-08f3-42c9-8767-d9cc0c6b1588.png)
+        
+        - Converter.sol 생성
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155467992-5a7b0c59-5283-4934-9b2a-9cdace95d9bd.png)
+            
+            ```solidity
+            // SPDX-License-Identifier: GPL-3.0
+            pragma solidity >=0.7.0 < 0.9.0;
+            
+            contract Converter{
+                function stringToBytes32(string memory source) public pure returns (bytes32 result) {
+                    bytes memory bytesString = bytes(source);
+                    if(bytesString.length == 0 ) {
+                        return 0x0;
+                    } 
+                    assembly {
+                        result := mload(add(source, 32))
+                    }
+                }
+            }
+            ```
+            
+        - compile & deploy
+            - stringToBytes32 변환기 생성 확인
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468004-b9779bc9-1707-4380-b377-361ed2006162.png)
+            
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468019-b6fa2d0b-2854-447d-bcd9-8e09d4dd4d87.png)
+        
+        - 기호1 → stringToBytes32
+            - result 0xeab8b0ed98b83100000000000000000000000000000000000000000000000000
+        - 기호2
+            - result 0xeab8b0ed98b83200000000000000000000000000000000000000000000000000
+        - 기호3
+            - result 0xeab8b0ed98b83300000000000000000000000000000000000000000000000000
+        - parameter에 기호1, 기호2, 기호3   →  bytes32[] 형태로 입력
+            - ["0xeab8b0ed98b83100000000000000000000000000000000000000000000000000", "0xeab8b0ed98b83200000000000000000000000000000000000000000000000000", "0xeab8b0ed98b83300000000000000000000000000000000000000000000000000"]
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468039-6b9c436f-c5a4-45d0-9305-d9bb4647d726.png)
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468067-b1d479d7-90fb-48eb-a2d3-5002380ab206.png)
+        
+    
+    **과제2  :  상태 변수의 의미 알기**
+    
+    - chairperson 변수 호출
+        - 컨트랙트 배포를 수행한 주소가 할당되어 있는지 확인
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468542-d275d15b-29f6-48b2-b948-9961b8ac915b.png)
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468561-06390f01-9077-4c07-b5ee-18790a626cb7.png)
+            
+    - proposals 변수 호출 (인덱스 값)
+        - 0 : proposalNames[0] 값 확인 : **기호1**
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468574-304720fb-dd82-4486-a74f-3a35bfddc57c.png)
+            
+        - 1 : proposalNames[1] 값 확인 : **기호2**
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468589-f18da3d2-ef60-4b9a-a072-392a3f0b69ec.png)
+            
+        - 2 : proposalNames[2] 값 확인 : **기호3**
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468618-3cadce5d-915f-4073-b17d-789bdace2d60.png)
+            
+    
+    **과제3  :  함수 및 변수 호출하기**
+    
+    - 아직 선택하지 않은 계정을 이용하여 delegate() 호출
+        - delegate()   →  유권자에게 투표 위임
+            
+            transact to
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468723-398a315c-0e61-4a56-b215-147e526af4ce.png)
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468733-757f58ed-34e2-40b3-bace-85bbefe623a9.png)
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468743-0b7b53aa-75b7-476d-8702-a1b3b9e43179.png)
+            
+    - Deploy & Transactions의 account에서  방금 전 delegate한 계정으로 호출자 변경
+        
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468759-ee9bf7b3-8ee2-4bdd-bf63-9497c792ffad.png)
+        
+    - proposals의 index 중 하나를 입력하고 vote() 호출  →  투표위임 받은 계정으로 투표 진행
+        
+             transact to
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468774-a447aa19-27b2-4cbd-adca-cd3d073c2574.png)
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468788-093a36d5-6ed0-4fad-bdf5-4a5874c3a1ce.png)
+        
+    - 위에서 투표한 계정의 voters 정보 확인
+        
+            vote to
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468802-3eadef99-3626-4e11-bf7a-936c9480d47c.png)
+        
+    
+    **과제4  :  3_Ballot을 Ropsten 테스트넷에 배포하기**
+    
+    - 사전 확인  :  MetaMask 지갑이 Ropsten Test Network에 연결되어 있는지 확인
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155468974-fcaa417f-a4c0-4345-baa6-a6cf90f91b1a.png)
+        
+    - 배포 전 Deploy & Run Transaction 환경 설정 확인
+        - Injected Web3 환경 확인  -  Ropsten Network로 배포됨을 확인
+            
+            MetaMask 계정 연동 확인
+            
+            ![image](https://user-images.githubusercontent.com/53833541/155468988-576858d3-5057-4ceb-ba99-5313d11f7210.png)
+            
+    - 배포 요청시 MetaMask 요청 화면 확인
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155469020-2adaedb8-0640-4ed0-93fe-0c53385f3ef4.png)
+        
+    - 배포 완료 화면 - 이더스캔 화면 확인
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155469037-ebaae6f1-3abb-4cc8-a33a-e46925479ce6.png)
+        
+        ![image](https://user-images.githubusercontent.com/53833541/155469060-db5c80cd-3843-4965-9e64-9055eab1f2b2.png)
+        
+    - Injected Web3
+        - 브라우저에 내장된 Provider
+        - MetaMask 지갑에 의해 주입된 Ropsten Network 와
+            
+            MetaMask에 설정된 계정을 그대로 Remix 환경에서 사용할 수 있게 해줌
