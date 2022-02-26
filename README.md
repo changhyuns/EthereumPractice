@@ -416,3 +416,123 @@ result :
         - MetaMask 지갑에 의해 주입된 Ropsten Network 와
             
             MetaMask에 설정된 계정을 그대로 Remix 환경에서 사용할 수 있게 해줌
+	    
+<br><br>
+
+- **Solidity**
+    
+    **컨트랙트** <br>
+    	- contract Storage {  ~~~ } 형태
+    
+    **상태 변수** <br>
+    	- external, public, private 접근 제어자 지정 가능 <br>
+    	- 기본형, 구조체, 배열 등 다양한 자료형 제공
+    
+    **함수** <br>
+    	- 컨트랙트 단위 기능 <br>
+    	- 파라미터, 제어자, 반환 값 지정 가능 <br>
+    	- 함수 내에서 상태 변수의 값을 변경(write), 읽기(read) 가능 <br>
+    	- function addNumber(uint x) public returns (uint) { return num += x; } 형태 <br>
+    	- public view returns ~~ : 상태 변수에 접근하여 변경을 하는게 아니라, 변경 없이 결과 값을 보여주기만 함 (gas비 소모x) - 마음껏 사용 가능! <br>
+    	- public pure returns ~~ : 상태 변수에 접근하지 않아도 순수한 함수인 경우 사용  <br>
+    
+    **자료형** <br>
+    	- 논리형 : bool(true / false) <br>
+    	- 정수형 : uint(unsigned integer), int(signed integer) <br>
+    	- 주소형 : address 이더리움의 주소 <br>
+    	- 바이트형 : bytes# , byte[] 
+    
+    **접근 제어자** <br>
+    	- private  컨트랙트 내에서만 접근 가능 (상태 변수와 함수 모두 사용 가능) <br>
+    	- internal 현재 컨트랙트와 자식 컨트랙트에서 접근 가능 (상태 변수에는 사용 불가) <br>
+    	- public  현재 컨트랙트, 자식 컨트랙트, 외부 컨트랙트 및 주소에서 접근 가능 (상태 변수와 함수 모두 사용 가능) <br>
+    	- external 외부 컨트랙트와 주소에서 접근 가능 (상태 변수와 함수 모두 사용 가능)
+    
+    **배열** <br>
+    	- 함수 내에서 로컬 변수로 사용하기 위해서는 **고정 길이**로 선언해야 함 <br>
+    	- index로 접근 가능, push, pop, delete 가능 <br>
+    	- delete arr[index]  →  해당 index의 값을 0으로 **초기화**
+    
+    **매핑** <br>
+    	- 매핑 선언  mapping(key => value) public addrTouint; 형태로 사용.  key는 unique <br>
+    	- delete는 마찬가지로 삭제가 아니라, 값을 초기화 <br>
+    	- 매핑에 저장된 key의 목록을 얻는 방법은 제공하지 않는다. 별도의 방법을 통해 key의 목록을 가지고 있어야만 접근 가능
+    
+    **Struct** <br>
+    	- struct MyStruct { string text; bool boolean; }  형태 <br>
+    	- MyStruct[] public structArray; 배열도 가능 <br>
+    	- push 경우  JSON 형태도 지원 <br>
+    
+    **제어문** <br>
+    	- 조건문 if - else <br>
+    	- 삼항 연산자 x < y ? 1 : 2 <br>
+    	- 반복문 while문, for문 (블록체인의 경우 loop는 정말 유의해야 한다 - 무한 루프 경우 gas 소비 상상 불가)
+    
+    **화폐 단위** <br>
+    	- 이더리움 VM에서 소수점을 허용하지 않기 때문에 사용 <br>
+    	- wei 가장 작은 단위 <br>
+    	- gwei : 10^9 wei <br>
+	- ether : 10^18 wei, 10^9 gwei
+
+
+**storage, memory, calldata 비교** <br>
+	- storage : 영구 데이터 영역에 데이터를 저장. 컨트랙트의 상태 변수가 storage에 저장됨. storage 키워드는 큰 비용을 초래함 <br>
+	- memory : 함수 안에서 사용되는 임시 데이터를 저장하는데에 사용 <br>
+	- calldata : 함수에 전달되는 파라미터같이  변경 불가. 임시 데이터가 저장되는 영역
+	
+**TodoList.sol 작성해보기**  <br>
+	- 제목, 수행 여부 포함 <br>
+	- [추가, 제목 수정, 완료 여부 변경, 상세 정보 확인] 가능, [목록 확인] 불가 <br>
+	
+	
+	
+		// SPDX-License-Identifier: GPL-3.0
+
+		pragma solidity >=0.7.0 <0.9.0;
+
+		/*
+		 * @title TodoList
+		 * @method create, update, toggle, get
+		 */
+
+		contract TodoList {
+
+		    struct TodoListStruct {
+		       string title; // title of TodoList
+		       bool isDone;  // is TodoList inProgress or Done ?
+		    }
+
+		    // array of TodoListStructs
+		    TodoListStruct[] public todoListArray;
+
+		    // mapping address to TodoListStruct
+		    mapping(address => TodoListStruct) public addrToTodoListStruct;
+
+		    // methods
+		    // create TodoList
+		    function create(string memory _title) public {
+			todoListArray.push(TodoListStruct({title: _title, isDone: false}));
+		    }
+
+		    // update TodoList Title  using index
+		    // memory : temporary data that we use inside of function
+		    // storage : persistent(permanent) data - state variable of contract
+		    function updateTitle(uint _index, string memory _title) public {
+			TodoListStruct storage todoListStruct = todoListArray[_index];
+			todoListStruct.title = _title;
+		    }
+
+		    // update TodoList isDone - make it Done (true) or make it InProgress (false)
+		    function updateIsDone(uint _index) public {
+			TodoListStruct storage todoListStruct = todoListArray[_index];
+			bool currentStatus = todoListStruct.isDone;
+			todoListStruct.isDone = !currentStatus;  // make it opposite
+		    }
+
+		    // get TodoList Detail using index
+		    function getTodoList(uint _index) public view returns(TodoListStruct memory) {
+			return todoListArray[_index];
+		    }
+		}
+	
+    
