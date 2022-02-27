@@ -475,64 +475,191 @@ result :
 	- ether : 10^18 wei, 10^9 gwei
 
 
-**storage, memory, calldata 비교** <br>
-	- storage : 영구 데이터 영역에 데이터를 저장. 컨트랙트의 상태 변수가 storage에 저장됨. storage 키워드는 큰 비용을 초래함 <br>
-	- memory : 함수 안에서 사용되는 임시 데이터를 저장하는데에 사용 <br>
-	- calldata : 함수에 전달되는 파라미터같이  변경 불가. 임시 데이터가 저장되는 영역
-	
-**TodoList.sol 작성해보기**  <br>
-	- 제목, 수행 여부 포함 <br>
-	- [추가, 제목 수정, 완료 여부 변경, 상세 정보 확인] 가능, [목록 확인] 불가 <br>
-	
-	
-	
-		// SPDX-License-Identifier: GPL-3.0
+	**storage, memory, calldata 비교** <br>
+		- storage : 영구 데이터 영역에 데이터를 저장. 컨트랙트의 상태 변수가 storage에 저장됨. storage 키워드는 큰 비용을 초래함 <br>
+		- memory : 함수 안에서 사용되는 임시 데이터를 저장하는데에 사용 <br>
+		- calldata : 함수에 전달되는 파라미터같이  변경 불가. 임시 데이터가 저장되는 영역
 
-		pragma solidity >=0.7.0 <0.9.0;
+	**TodoList.sol 작성해보기**  <br>
+		- 제목, 수행 여부 포함 <br>
+		- [추가, 제목 수정, 완료 여부 변경, 상세 정보 확인] 가능, [목록 확인] 불가 <br>
 
+
+
+			// SPDX-License-Identifier: GPL-3.0
+
+			pragma solidity >=0.7.0 <0.9.0;
+
+			/*
+			 * @title TodoList
+			 * @method create, update, toggle, get
+			 */
+
+			contract TodoList {
+
+			    struct TodoListStruct {
+			       string title; // title of TodoList
+			       bool isDone;  // is TodoList inProgress or Done ?
+			    }
+
+			    // array of TodoListStructs
+			    TodoListStruct[] public todoListArray;
+
+			    // mapping address to TodoListStruct
+			    mapping(address => TodoListStruct) public addrToTodoListStruct;
+
+			    // methods
+			    // create TodoList
+			    function create(string memory _title) public {
+				todoListArray.push(TodoListStruct({title: _title, isDone: false}));
+			    }
+
+			    // update TodoList Title  using index
+			    // memory : temporary data that we use inside of function
+			    // storage : persistent(permanent) data - state variable of contract
+			    function updateTitle(uint _index, string memory _title) public {
+				TodoListStruct storage todoListStruct = todoListArray[_index];
+				todoListStruct.title = _title;
+			    }
+
+			    // update TodoList isDone - make it Done (true) or make it InProgress (false)
+			    function updateIsDone(uint _index) public {
+				TodoListStruct storage todoListStruct = todoListArray[_index];
+				bool currentStatus = todoListStruct.isDone;
+				todoListStruct.isDone = !currentStatus;  // make it opposite
+			    }
+
+			    // get TodoList Detail using index
+			    function getTodoList(uint _index) public view returns(TodoListStruct memory) {
+				return todoListArray[_index];
+			    }
+			}
+
+    
+**FundRaising** <br>
+	- **일회성**으로 동작하는 모금 컨트랙트 <br>
+	- 일정 기간 동안만 이더를 지불하여 모금에 참여 <br>
+	- 1) 모금, 2) 현재 모금액 확인, 3)모금액 수령 기능 <br><br>
+	- **FundRaising.sol 작성**
+	
+	/*
+
+	// SPDX-License-Identifier: GPL-3.0
+
+	pragma solidity >=0.7.0 <0.9.0;
+
+	contract FundRaising {
+
+	    // state variables
+	    uint public constant MINIMUM_AMOUNT = 1e16;  // least amount : 10^16 wei = 0.01 ETH
+	    uint public fundRaisingCloses;               // when the fundRaising closes
+	    address public beneficiary;                  // who gets the benefit - wallet address
+	    address[] funders;                           // list of people raising fund
+	    FunderStruct[] funderStructs;                // list of FunderStructs
+
+	    struct FunderStruct {
+		address funderAddr;    // address of funder
+		uint256 fundRaised;    // how much funder raised
+	    }
+
+	    // mapping address to FunderStruct
+	    mapping (address => FunderStruct) public addrToFunderStruct;
+
+	    /*
+	    * constructor
+	    * duration : seconds ( 3600 -> 1 hour )
+	    * beneficiary : wallet address
+	    */
+	    constructor (uint _duration, address _beneficiary) {
+		fundRaisingCloses = block.timestamp + _duration;
+		beneficiary       = _beneficiary;
+	    }
+
+	    /*
+	    * @methods
+	    * fund, currentCollection, withdraw, selectRandomFunder
+	    */
+	    // fund
+	    // payable : enable to send and receive ETH
+	    // msg.value : amount of ETH
+	    // msg.sender : address of the function caller
+	    function fund() public payable {
 		/*
-		 * @title TodoList
-		 * @method create, update, toggle, get
-		 */
+		if(msg.value >= MINIMUM_AMOUNT) {               // check if you have sent more than MINIMUM_AMOUNT(constant)(0.01 ETH)
+		    if(block.timestamp < fundRaisingCloses) {   // check if it happened within a duration(period)
 
-		contract TodoList {
-
-		    struct TodoListStruct {
-		       string title; // title of TodoList
-		       bool isDone;  // is TodoList inProgress or Done ?
-		    }
-
-		    // array of TodoListStructs
-		    TodoListStruct[] public todoListArray;
-
-		    // mapping address to TodoListStruct
-		    mapping(address => TodoListStruct) public addrToTodoListStruct;
-
-		    // methods
-		    // create TodoList
-		    function create(string memory _title) public {
-			todoListArray.push(TodoListStruct({title: _title, isDone: false}));
-		    }
-
-		    // update TodoList Title  using index
-		    // memory : temporary data that we use inside of function
-		    // storage : persistent(permanent) data - state variable of contract
-		    function updateTitle(uint _index, string memory _title) public {
-			TodoListStruct storage todoListStruct = todoListArray[_index];
-			todoListStruct.title = _title;
-		    }
-
-		    // update TodoList isDone - make it Done (true) or make it InProgress (false)
-		    function updateIsDone(uint _index) public {
-			TodoListStruct storage todoListStruct = todoListArray[_index];
-			bool currentStatus = todoListStruct.isDone;
-			todoListStruct.isDone = !currentStatus;  // make it opposite
-		    }
-
-		    // get TodoList Detail using index
-		    function getTodoList(uint _index) public view returns(TodoListStruct memory) {
-			return todoListArray[_index];
 		    }
 		}
+		*/
+
+		// instead of using if clauses,
+		// use require statement  -  save gas !
+		// if reqeuire statements return false, return the pre-written error messages and terminate the function
+		require(msg.value >= MINIMUM_AMOUNT, "MINIMUM AMOUNT: 0.01 ETH");
+		require(block.timestamp < fundRaisingCloses, "FUND RAISING CLOSED");
+
+		// address of the function caller
+		address funder = msg.sender;
+		// add funder
+		funders.push(funder);       // last index
+
+		funderStructs.push(FunderStruct({funderAddr: funder, fundRaised: msg.value}));
+	    }
+
+	    // get currently collected(raised) amount
+	    // public view -> no gas
+	    // address(this) : global variable - contract
+	    function currentCollection() public view returns(uint256) {
+
+		// returns balance of this contract
+		return address(this).balance;
+	    }
+
+
+	    // if require statemet will be called frequently, use modifier  -  save gas !
+	    modifier onlyAfterFundCloses() {
+		require(block.timestamp > fundRaisingCloses, "Fund Raising in still in progress");
+		_; 
+	    }
+
+	    modifier onlyBeneficiary() {
+		require(msg.sender == beneficiary, "You are not specified recipient!");
+		_;    // don't forget to use _;  ->  means that you go back to function
+	    }
+
+	    // receive the amount raised
+	    // can only be called after the duration(period)
+	    // only specified recipients can call this funtion
+	    // modifier : onlyAfterFundCloses, onlyBeneficiary
+	    function withdraw() public payable onlyAfterFundCloses onlyBeneficiary {
+		// check line 63.  modifier
+		// require(block.timestamp > fundRaisingCloses, "Fund Raising is still in progress");
+		// require(msg.sender == beneficiary, "You are not specified recipient!");
+
+		// send the balance to recipient
+		// <address payable>.transfer(uint256 amount)
+		payable(msg.sender).transfer(address(this).balance);  // 
+	    }
+
+	    function selectRandomFunder() public view returns(FunderStruct memory) {
+
+		uint numOfFunders = funders.length;
+
+		if(numOfFunders == 0) return FunderStruct({funderAddr: address(0), fundRaised: 0});
+
+		// deprecated.  Use abi.encodedPacked() instead
+		// uint random = uint(keccak256(block.timestamp, msg.sender, randNonce)) % numOfFunders;
+		bytes32 rand = keccak256(abi.encodePacked(blockhash(block.number)));
+
+		return numOfFunders == 1 ? funderStructs[0] : funderStructs[uint(rand) % numOfFunders];
+	    }
+
+	}
+		
+	*/
 	
-    
+## 모금 종료 <br>
+  + 수령 계정에서 withdraw() 호출 후 잔액 확인 <br>
+    ![image](https://user-images.githubusercontent.com/53833541/155889832-a8b725f3-9449-4f48-9c9c-43ea8fc610fe.png)
+	
+	
