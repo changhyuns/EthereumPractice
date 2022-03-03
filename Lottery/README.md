@@ -56,4 +56,31 @@
 
 + 배포 후 재배포 <br><br>
     > truffle migrate --reset
+<br>
 
++ 블록체인 접근 <br><br>
+    > truffle console
+<br>
+
++ 배포된 Lottery 인스턴스 접근 <br><br>
+    > Lottery.deployed().then(function(instance){lt=instance}) <br>
+    > lt.abi   인터페이스 확인 <br>
+    > lt.owner() owner(deployer) 주소 확인 <br>
+    > lt.getSomeValue()  5 리턴 확인
+
+<br><br>
+
+# 테스트코드 작성
+
++ lottery-test.js 작성 <br><br>
+    > lottery-smart-contract > test > lottery-test.js
+
+<br><br>
+
+# DApp 서비스 설계
+
++ 지갑 관리 <br><br>
+    > 특정 key를 hot wallet으로 관리 ? <br>
+    > 인터넷 연결 ? 인터넷 연결 없는 곳 ? <br>
+    > 돈이 부족하면 어떻게 알림을 받고, cold wallet에서 돈을 가져올지 ? <br>
+    > 돈이 많을 땐 하나의 key로 돈을 관리할지 ? 2 of 3 지갑을 이용할지 ? <br>
